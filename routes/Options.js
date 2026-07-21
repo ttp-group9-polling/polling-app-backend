@@ -1,46 +1,68 @@
 const express = require("express");
 const router = express.Router();
+
 const { Option } = require("../models");
 
-//Get All Options
 router.get("/", async (req, res) => {
-  const options = await Option.findAll();
-  res.json(options);
-});
-
-//Get one Option by ID
-router.get("/:id", (req, res) => {
-    const options = await Option.findByPk(req.params.id);
-    if (!options) {
-        return res.status(404).json({ error: "Option not found!" });
-    }
+  try {
+    const options = await Option.findAll();
     res.json(options);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
-//Create an Option
+router.get("/:id", async (req, res) => {
+  try {
+    const option = await Option.findByPk(req.params.id);
+
+    if (!option) {
+      return res.status(404).json({ error: "Option not found" });
+    }
+
+    res.json(option);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 router.post("/", async (req, res) => {
-    const options = await Option.create(req.body);
-    res.status(201).json(options);
+  try {
+    const option = await Option.create(req.body);
+    res.status(201).json(option);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
-//Update an Option
 router.patch("/:id", async (req, res) => {
-    const options = await Option.findByPk(req.params.id);
-    if (!options) {
-        return res.status(404).json({ error: "Option not found!" });
+  try {
+    const option = await Option.findByPk(req.params.id);
+
+    if (!option) {
+      return res.status(404).json({ error: "Option not found" });
     }
-    await Option.update(req.body);
-    res.json(options);
+
+    await option.update(req.body);
+    res.json(option);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
 });
 
-//Delete an Option
 router.delete("/:id", async (req, res) => {
-    const options = await Option.findByPk(req.params.id);
-    if(!options) {
-        return res.status(404).json({ error: "Option not found!" });
+  try {
+    const option = await Option.findByPk(req.params.id);
+
+    if (!option) {
+      return res.status(404).json({ error: "Option not found" });
     }
-    await options.destroy();
+
+    await option.destroy();
     res.sendStatus(204);
-})
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 module.exports = router;

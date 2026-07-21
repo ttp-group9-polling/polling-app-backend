@@ -1,16 +1,16 @@
+require("dotenv").config();
+
 const express = require("express");
-const PORT = 3000;
-const { db } = require("./models");
 const morgan = require("morgan");
 const cors = require("cors");
-const pollRouter = require("./routes/Polls");
-const optionRouter = require("./models/Option");
-const app = express();
 
-function logger(req, res, next) {
-  console.log(`${req.method} ${req.url}`);
-  next();
-}
+const { db } = require("./models");
+const pollRouter = require("./routes/Polls");
+const optionRouter = require("./routes/Options");
+const voteRouter = require("./routes/Votes");
+
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.use(morgan("dev"));
 app.use(cors());
@@ -20,17 +20,20 @@ app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
-app.use("/polls", pollRouter);
-app.use("/options", optionRouter);
+app.use("/api/polls", pollRouter);
+app.use("/api/options", optionRouter);
+app.use("/api/votes", voteRouter);
 
-db.sync({ alter: true })
-  .then(() => {
+async function startApp() {
+  try {
+    await db.sync();
+
     app.listen(PORT, () => {
-      console.log(`Server is running on PORT ${PORT} `);
+      console.log(`Server running on http://localhost:${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.error("Database sync failed:", err);
-  });
+  } catch (error) {
+    console.error("Database sync failed:", error);
+  }
+}
 
-app.use(logger);
+startApp();
