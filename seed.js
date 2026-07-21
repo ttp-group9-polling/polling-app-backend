@@ -23,9 +23,21 @@ async function seed() {
     pollId: favoriteFoodPoll.id,
   });
 
-  await Vote.create({ optionId: optionOne.id });
-  await Vote.create({ optionId: optionTwo.id });
-  await Vote.create({ optionId: optionThree.id });
+  await Vote.create({
+    optionId: optionOne.id,
+    pollId: favoriteFoodPoll.id,
+    voterEmail: "alice@example.com",
+  });
+  await Vote.create({
+    optionId: optionTwo.id,
+    pollId: favoriteFoodPoll.id,
+    voterEmail: "bob@example.com",
+  });
+  await Vote.create({
+    optionId: optionThree.id,
+    pollId: favoriteFoodPoll.id,
+    voterEmail: "chris@example.com",
+  });
 
   console.log("Seeded Successfully!");
   await db.close();

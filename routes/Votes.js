@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const { UniqueConstraintError } = require("sequelize");
 
-const { Vote, Option } = require("../models");
+const { Vote, Option, Poll } = require("../models");
 
 router.get("/", async (req, res) => {
   try {
@@ -17,7 +18,23 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { optionId } = req.body;
+    const { optionId, pollId, voterEmail } = req.body;
+
+    if (!optionId || !pollId || !voterEmail) {
+      return res
+        .status(400)
+        .json({ error: "optionId, pollId, and voterEmail are required" });
+    }
+
+    const normalizedEmail = voterEmail.trim().toLowerCase();
+    if (!normalizedEmail) {
+      return res.status(400).json({ error: "voterEmail is required" });
+    }
+
+    const poll = await Poll.findByPk(pollId);
+    if (!poll) {
+      return res.status(404).json({ error: "Poll not found" });
+    }
 
     const option = await Option.findByPk(optionId);
 
@@ -25,10 +42,35 @@ router.post("/", async (req, res) => {
       return res.status(404).json({ error: "Option not found" });
     }
 
-    const vote = await Vote.create({ optionId });
+    if (option.pollId !== Number(pollId)) {
+      return res
+        .status(400)
+        .json({ error: "Option does not belong to selected poll" });
+    }
+
+    const existingVote = await Vote.findOne({
+      where: { pollId, voterEmail: normalizedEmail },
+    });
+
+    if (existingVote) {
+      return res
+        .status(409)
+        .json({ error: "This email has already voted in this poll" });
+    }
+
+    const vote = await Vote.create({
+      optionId,
+      pollId,
+      voterEmail: normalizedEmail,
+    });
 
     res.status(201).json(vote);
   } catch (error) {
+    if (error instanceof UniqueConstraintError) {
+      return res
+        .status(409)
+        .json({ error: "This email has already voted in this poll" });
+    }
     res.status(400).json({ error: error.message });
   }
 });
