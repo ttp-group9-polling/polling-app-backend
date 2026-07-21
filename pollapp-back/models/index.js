@@ -9,4 +9,7 @@ Option.belongsTo(Poll, { foreignKey: "pollId" });
 Option.hasMany(Vote, { foreignKey: "optionId" });
 Vote.belongsTo(Option, { foreignKey: "optionId" });
 
+Poll.hasMany(Vote, { foreignKey: "pollId" });
+Vote.belongsTo(Poll, { foreignKey: "pollId" });
+
 module.exports = { db, Option, Vote, Poll };
