@@ -1,6 +1,6 @@
 const { Sequelize } = require("sequelize");
 
-// I made it this way, because my laptop runs on a Linus OS
+// I made it this way, because my laptop runs on a Linux OS
 // So it might be different to how Mac and Windows do it
 // - Rehman Mohammad
 const db = new Sequelize(
