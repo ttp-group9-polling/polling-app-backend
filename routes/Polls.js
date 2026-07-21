@@ -1,46 +1,58 @@
 const express = require("express");
 const router = express.Router();
-const { Poll } = require("../models");
 
-//Get all Polls
+const { Vote, Option } = require("../models");
+
 router.get("/", async (req, res) => {
-  const poll = await Poll.findAll();
-  res.json(poll);
-});
+  try {
+    const votes = await Vote.findAll({
+      include: Option,
+    });
 
-//Get one Poll by its ID #
-router.get("/:id", async (req, res) => {
-  const poll = await Poll.findByPk(req.params.id);
-  if (!poll) {
-    return res.status(404).json({ error: "Poll not found!" });
+    res.json(votes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-  res.json(poll);
 });
 
-//Creating a New Poll
 router.post("/", async (req, res) => {
-  const poll = await Poll.create(req.body);
-  res.status(201).json(poll);
-});
+  try {
+    const { pollId, optionId, voterId } = req.body;
 
-//Update a Poll
-router.patch("/:id", async (req, res) => {
-  const poll = await Poll.findByPk(req.params.id);
-  if (!poll) {
-    return res.status(404).json({ error: "Poll not found!" });
-  }
-  await poll.update(req.body);
-  res.json(poll);
-});
+    if (!pollId || !optionId || !voterId) {
+      return res.status(400).json({
+        error: "pollId, optionId, and voterId are required",
+      });
+    }
 
-//Deleting a Poll
-router.delete("/:id", async (req, res) => {
-  const poll = await Poll.findByPk(req.params.id);
-  if (!poll) {
-    return res.status(404).json({ error: "Poll not found!" });
+    const option = await Option.findByPk(optionId);
+
+    if (!option) {
+      return res.status(404).json({ error: "Option not found" });
+    }
+
+    if (option.pollId !== pollId) {
+      return res.status(400).json({
+        error: "This option does not belong to the selected poll",
+      });
+    }
+
+    const vote = await Vote.create({
+      pollId,
+      optionId,
+      voterId,
+    });
+
+    res.status(201).json(vote);
+  } catch (error) {
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res.status(409).json({
+        error: "This voter has already voted in this poll",
+      });
+    }
+
+    res.status(400).json({ error: error.message });
   }
-  await poll.destroy();
-  res.sendStatus(204);
 });
 
 module.exports = router;

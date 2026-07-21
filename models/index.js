@@ -12,6 +12,15 @@ Option.belongsTo(Poll, {
   foreignKey: "pollId",
 });
 
+Poll.hasMany(Vote, {
+  foreignKey: "pollId",
+  onDelete: "CASCADE",
+});
+
+Vote.belongsTo(Poll, {
+  foreignKey: "pollId",
+});
+
 Option.hasMany(Vote, {
   foreignKey: "optionId",
   onDelete: "CASCADE",
@@ -21,4 +30,9 @@ Vote.belongsTo(Option, {
   foreignKey: "optionId",
 });
 
-module.exports = { db, Poll, Option, Vote };
+module.exports = {
+  db,
+  Poll,
+  Option,
+  Vote,
+};
