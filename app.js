@@ -26,13 +26,16 @@ app.use("/api/votes", voteRouter);
 
 async function startApp() {
   try {
+    await db.authenticate();
+    console.log("Database connection established.");
+
     await db.sync();
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error("Database sync failed:", error);
+    console.error("Database startup failed:", error);
   }
 }
 
