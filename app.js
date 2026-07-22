@@ -29,7 +29,7 @@ async function startApp() {
     await db.authenticate();
     console.log("Database connection established.");
 
-    await db.sync();
+    await db.sync({ force: true });
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);

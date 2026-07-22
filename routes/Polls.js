@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { db, Poll, Option, Vote } = require("../models");
 
+//Get all Polls
 router.get("/", async (req, res) => {
   try {
     const polls = await Poll.findAll({
@@ -16,6 +17,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+//Create a new Poll
 router.post("/", async (req, res) => {
   const { title, description, options } = req.body;
 
@@ -40,7 +42,7 @@ router.post("/", async (req, res) => {
 
     await Option.bulkCreate(
       cleanOptions.map((text) => ({ text, pollId: poll.id })),
-      { transaction }
+      { transaction },
     );
 
     await transaction.commit();
@@ -53,6 +55,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+//Get a Poll by its ID
 router.get("/:id", async (req, res) => {
   try {
     const poll = await Poll.findByPk(req.params.id, {
@@ -85,6 +88,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+//Create a new vote for each poll
 router.post("/:id/vote", async (req, res) => {
   try {
     const pollId = Number(req.params.id);
