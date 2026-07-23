@@ -29,7 +29,16 @@ async function startApp() {
     await db.authenticate();
     console.log("Database connection established.");
 
-    await db.sync({ force: true });
+    // await db.sync({ force: true });
+
+    // Sync our Sequelize models with the actual database tables.
+    // IMPORTANT: no { force: true } here — that option DROPS and
+    // recreates every table on every server start/restart, wiping
+    // all real data. { force: true } belongs only in seed.js, where
+    // wiping and reseeding is exactly what we want. A plain db.sync()
+    // just creates tables if they don't exist yet and otherwise leaves
+    // existing data alone.
+    await db.sync(); 
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
