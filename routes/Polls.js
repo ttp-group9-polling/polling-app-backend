@@ -1,8 +1,11 @@
+
+// routes/Polls.js - Handles creating polls, viewing polls, and voting.
 const express = require("express");
 const router = express.Router();
 
 const { db, Poll, Option, Vote } = require("../models");
 
+// Gets all polls with their options.
 router.get("/", async (req, res) => {
   try {
     const polls = await Poll.findAll({
@@ -16,6 +19,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Creates a poll and its options.
 router.post("/", async (req, res) => {
   const { title, description, options } = req.body;
 
@@ -33,6 +37,7 @@ router.post("/", async (req, res) => {
     return res.status(400).json({ error: "A poll needs at least 2 options" });
   }
 
+    // Keeps the poll and its options in one transaction.
   const transaction = await db.transaction();
 
   try {
@@ -53,6 +58,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Gets one poll with its results.
 router.get("/:id", async (req, res) => {
   try {
     const poll = await Poll.findByPk(req.params.id, {
@@ -63,6 +69,7 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ error: "Poll not found" });
     }
 
+      // Counts the votes for each option.
     const options = poll.Options.map((option) => ({
       id: option.id,
       text: option.text,
@@ -85,6 +92,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// Records a vote for one poll option.
 router.post("/:id/vote", async (req, res) => {
   try {
     const pollId = Number(req.params.id);
@@ -132,4 +140,4 @@ router.post("/:id/vote", async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router; // Allows app.js to use these routes

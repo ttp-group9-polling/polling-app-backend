@@ -1,8 +1,10 @@
+// routes/Votes.js - Handles viewing and creating votes.
 const express = require("express");
 const router = express.Router();
 
 const { Vote, Option } = require("../models");
 
+// Gets all votes with their options.
 router.get("/", async (req, res) => {
   try {
     const votes = await Vote.findAll({
@@ -15,6 +17,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Creates a new vote.
 router.post("/", async (req, res) => {
   try {
     const { pollId, optionId, voterEmail } = req.body;
@@ -35,6 +38,7 @@ router.post("/", async (req, res) => {
       });
     }
 
+     // Checks that the option belongs to the selected poll.
     if (option.pollId !== Number(pollId)) {
       return res.status(400).json({
         error: "This option does not belong to this poll",
@@ -61,4 +65,4 @@ router.post("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router; // Allows app.js to use these routes

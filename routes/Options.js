@@ -1,8 +1,10 @@
+// routes/Options.js - Handles creating, viewing, updating, and deleting options.
 const express = require("express");
 const router = express.Router();
 
 const { Option } = require("../models");
 
+// Gets all options.
 router.get("/", async (req, res) => {
   try {
     const options = await Option.findAll();
@@ -12,6 +14,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Gets one option.
 router.get("/:id", async (req, res) => {
   try {
     const option = await Option.findByPk(req.params.id);
@@ -26,6 +29,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+// Creates a new option.
 router.post("/", async (req, res) => {
   try {
     const option = await Option.create(req.body);
@@ -35,6 +39,7 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Updates an option.
 router.patch("/:id", async (req, res) => {
   try {
     const option = await Option.findByPk(req.params.id);
@@ -50,6 +55,7 @@ router.patch("/:id", async (req, res) => {
   }
 });
 
+// Deletes an option.
 router.delete("/:id", async (req, res) => {
   try {
     const option = await Option.findByPk(req.params.id);
@@ -65,4 +71,4 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router; // Allows app.js to use these routes

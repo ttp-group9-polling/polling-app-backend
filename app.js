@@ -1,3 +1,4 @@
+// app.js - Starts the server and connects it to the database.
 require("dotenv").config();
 
 const express = require("express");
@@ -12,18 +13,22 @@ const voteRouter = require("./routes/Votes");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Sets up server middleware.
 app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
+// Checks that the server is running.
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
+// Connects each API path to its routes.
 app.use("/api/polls", pollRouter);
 app.use("/api/options", optionRouter);
 app.use("/api/votes", voteRouter);
 
+// Connects to the database and starts the server.
 async function startApp() {
   try {
     await db.authenticate();

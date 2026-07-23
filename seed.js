@@ -1,8 +1,12 @@
+// seed.js - Adds sample polls, options, and votes to the database.
 const { db, Option, Vote, Poll } = require("./models");
 
-async function seed() {
+  // Recreates the tables and removes existing data.
+async function seed() {   
   await db.sync({ force: true });
 
+
+  // Creates the food poll.
   const foodPoll = await Poll.create({
     title: "What is the best food?",
     description: "A quick poll to see what food consumers like.",
@@ -24,6 +28,7 @@ async function seed() {
     { pollId: foodPoll.id, optionId: rice.id, voterEmail: "alan@example.com" },
   ]);
 
+    // Creates the programming language poll.
   const langPoll = await Poll.create({
     title: "Favorite programming language?",
     description: "Vote for the language you reach for first.",
