@@ -1,3 +1,5 @@
+
+// models/Vote.js - Defines each vote and prevents duplicate votes.
 const { DataTypes } = require("sequelize");
 const db = require("../db");
 
@@ -32,4 +34,4 @@ const Vote = db.define(
   }
 );
 
-module.exports = Vote;
+module.exports = Vote; // Allows other files to use this model

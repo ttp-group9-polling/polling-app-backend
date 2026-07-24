@@ -1,3 +1,5 @@
+// models/Poll.js - Defines the poll title and description.
+
 const { DataTypes } = require("sequelize");
 const db = require("../db");
 
@@ -13,4 +15,4 @@ const Poll = db.define("Poll", {
   },
 });
 
-module.exports = Poll;
+module.exports = Poll; // Allows other files to use this model
