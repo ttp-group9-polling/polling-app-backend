@@ -40,6 +40,7 @@ async function startApp() {
     await db.authenticate();
     console.log("Database connection established.");
 
+    // Syncs the models without deleting existing data.
     await db.sync();
 
     app.listen(PORT, () => {

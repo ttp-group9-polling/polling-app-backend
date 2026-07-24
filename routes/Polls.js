@@ -1,5 +1,4 @@
 // routes/Polls.js - Handles creating polls, viewing polls, and voting.
-
 const express = require("express");
 const router = express.Router();
 
