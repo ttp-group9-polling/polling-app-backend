@@ -1,67 +1,92 @@
+// routes/Options.js - Handles creating, viewing, updating, and deleting options.
+
 const express = require("express");
 const router = express.Router();
 
 const { Option } = require("../models");
 
-router.get("/", async (req, res) => {
+// GET all options
+router.get("/", async (req, res, next) => {
   try {
     const options = await Option.findAll();
     res.json(options);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    next(err);
   }
 });
 
-router.get("/:id", async (req, res) => {
+// GET one option
+router.get("/:id", async (req, res, next) => {
   try {
     const option = await Option.findByPk(req.params.id);
 
     if (!option) {
-      return res.status(404).json({ error: "Option not found" });
+      return res.status(404).json({
+        error: "Option not found",
+      });
     }
 
     res.json(option);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    next(err);
   }
 });
 
-router.post("/", async (req, res) => {
+// CREATE an option
+router.post("/", async (req, res, next) => {
   try {
     const option = await Option.create(req.body);
     res.status(201).json(option);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+  } catch (err) {
+    if (err.name === "SequelizeValidationError") {
+      return res.status(400).json({
+        error: err.errors[0].message,
+      });
+    }
+
+    next(err);
   }
 });
 
-router.patch("/:id", async (req, res) => {
+// UPDATE an option
+router.patch("/:id", async (req, res, next) => {
   try {
     const option = await Option.findByPk(req.params.id);
 
     if (!option) {
-      return res.status(404).json({ error: "Option not found" });
+      return res.status(404).json({
+        error: "Option not found",
+      });
     }
 
     await option.update(req.body);
     res.json(option);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+  } catch (err) {
+    if (err.name === "SequelizeValidationError") {
+      return res.status(400).json({
+        error: err.errors[0].message,
+      });
+    }
+
+    next(err);
   }
 });
 
-router.delete("/:id", async (req, res) => {
+// DELETE an option
+router.delete("/:id", async (req, res, next) => {
   try {
     const option = await Option.findByPk(req.params.id);
 
     if (!option) {
-      return res.status(404).json({ error: "Option not found" });
+      return res.status(404).json({
+        error: "Option not found",
+      });
     }
 
     await option.destroy();
     res.sendStatus(204);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    next(err);
   }
 });
 

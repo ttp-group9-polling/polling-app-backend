@@ -1,3 +1,4 @@
+// db.js - Connects the app to the PostgreSQL database.
 require("dotenv").config();
 const { Sequelize } = require("sequelize");
 

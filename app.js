@@ -1,3 +1,5 @@
+// app.js - Starts the server and connects it to the database.
+
 require("dotenv").config();
 
 const express = require("express");
@@ -6,45 +8,46 @@ const cors = require("cors");
 
 const { db } = require("./models");
 const pollRouter = require("./routes/Polls");
-const optionRouter = require("./routes/Options");
-const voteRouter = require("./routes/Votes");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Sets up server middleware.
 app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 
+// Checks that the server is running.
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });
 
+// Connects the polls API path to the poll routes.
 app.use("/api/polls", pollRouter);
-app.use("/api/options", optionRouter);
-app.use("/api/votes", voteRouter);
 
+// Handles errors sent by next(err).
+app.use((err, req, res, next) => {
+  console.error(err);
+
+  res.status(500).json({
+    error: "Something went wrong",
+  });
+});
+
+// Connects to the database and starts the server.
 async function startApp() {
   try {
     await db.authenticate();
     console.log("Database connection established.");
 
-    // await db.sync({ force: true });
-
-    // Sync our Sequelize models with the actual database tables.
-    // IMPORTANT: no { force: true } here — that option DROPS and
-    // recreates every table on every server start/restart, wiping
-    // all real data. { force: true } belongs only in seed.js, where
-    // wiping and reseeding is exactly what we want. A plain db.sync()
-    // just creates tables if they don't exist yet and otherwise leaves
-    // existing data alone.
-    await db.sync(); 
+    // Syncs the models without deleting existing data.
+    await db.sync();
 
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
     });
-  } catch (error) {
-    console.error("Database startup failed:", error);
+  } catch (err) {
+    console.error("Database startup failed:", err);
   }
 }
 
